@@ -4,6 +4,14 @@
 ** See Copyright Notice in lua.h
 */
 
+//=====================================================================
+// 这个库提供了基本的数学函数。所以函数都放在表 math 中。
+// 注解有 "integer/float" 的函数会对整数参数返回整数结果，
+// 对浮点（或混合）参数返回浮点结果。
+// 圆整函数（math.ceil, math.floor, math.modf）在结果在整数范围内时
+// 返回整数，否则返回浮点数。
+//=====================================================================
+
 #define lmathlib_c
 #define LUA_LIB
 
@@ -23,6 +31,10 @@
 #define PI	(l_mathop(3.141592653589793238462643383279502884))
 
 
+//=====================================================================
+// POSIX 系统环境下使用 POSIX 标准的随机函数，
+// 其他系统使用 C 标准库里的。
+//=====================================================================
 #if !defined(l_rand)		/* { */
 #if defined(LUA_USE_POSIX)
 #define l_rand()	random()
@@ -36,6 +48,9 @@
 #endif				/* } */
 
 
+//---------------------------------------------------------------------
+// 返回 x 的绝对值。(integer/float)
+//---------------------------------------------------------------------
 static int math_abs (lua_State *L) {
   if (lua_isinteger(L, 1)) {
     lua_Integer n = lua_tointeger(L, 1);
@@ -79,6 +94,23 @@ static int math_atan (lua_State *L) {
   return 1;
 }
 
+
+//---------------------------------------------------------------------
+// 如果 x 可以转换为一个整数，返回该整数。否则返回 nil。
+//
+// > math.tointeger(2)
+// 2
+// > math.tointeger('2')
+// 2
+// > math.tointeger('2.3')
+// nil
+// > math.tointeger('2.0')
+// 2
+// > math.tointeger(2.0)
+// 2
+// > math.tointeger(2.3)
+// nil
+//---------------------------------------------------------------------
 
 static int math_toint (lua_State *L) {
   int valid;
@@ -281,6 +313,12 @@ static int math_randomseed (lua_State *L) {
 }
 
 
+//---------------------------------------------------------------------
+// 如果 x 是整数，返回 "integer"，如果它是浮点数，返回 "float"，
+// 如果 x 不是数字，返回 nil。
+//
+// NOTE: lua5.3 区分整数和浮点数，所以有这个函数。
+//---------------------------------------------------------------------
 static int math_type (lua_State *L) {
   if (lua_type(L, 1) == LUA_TNUMBER) {
       if (lua_isinteger(L, 1))
@@ -301,6 +339,9 @@ static int math_type (lua_State *L) {
 ** Deprecated functions (for compatibility only)
 ** ===================================================================
 */
+//=====================================================================
+// 兼容旧版本，新版本有新的操作符或者用其他函数组合代替。
+//=====================================================================
 #if defined(LUA_COMPAT_MATHLIB)
 
 static int math_cosh (lua_State *L) {
@@ -388,6 +429,7 @@ static const luaL_Reg mathlib[] = {
   {"huge", NULL},
   {"maxinteger", NULL},
   {"mininteger", NULL},
+  // 结束占位符
   {NULL, NULL}
 };
 
@@ -396,7 +438,7 @@ static const luaL_Reg mathlib[] = {
 ** Open math library
 */
 LUAMOD_API int luaopen_math (lua_State *L) {
-  // luaL_newlib 会新建一个空表，并将上面的C函数注册到这张表上，
+  // luaL_newlib 会新建一个空表，并将上面的 C 函数注册到这张表上，
   // 执行完后栈上面保留这张表。
   luaL_newlib(L, mathlib);                  // tbl
   // 注册 pi 常量
@@ -417,7 +459,7 @@ LUAMOD_API int luaopen_math (lua_State *L) {
   // -9223372036854775808
   lua_pushinteger(L, LUA_MININTEGER);
   lua_setfield(L, -2, "mininteger");
-  // 栈上面就剩 tbl，所以这里返回 1
+  // 栈上面就剩 tbl，所以这里返回 1。
   return 1;
 }
 
