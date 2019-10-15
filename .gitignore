@@ -1,4 +1,5 @@
 *.o
+tags
 
 /src/liblua.a
 /src/lua

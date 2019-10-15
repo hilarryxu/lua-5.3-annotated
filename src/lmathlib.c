@@ -396,15 +396,28 @@ static const luaL_Reg mathlib[] = {
 ** Open math library
 */
 LUAMOD_API int luaopen_math (lua_State *L) {
-  luaL_newlib(L, mathlib);
-  lua_pushnumber(L, PI);
-  lua_setfield(L, -2, "pi");
+  // luaL_newlib 会新建一个空表，并将上面的C函数注册到这张表上，
+  // 执行完后栈上面保留这张表。
+  luaL_newlib(L, mathlib);                  // tbl
+  // 注册 pi 常量
+  lua_pushnumber(L, PI);                    // tbl,PI
+  lua_setfield(L, -2, "pi");                // tbl
+  // 正无穷
+  // > print(math.huge)
+  // inf
   lua_pushnumber(L, (lua_Number)HUGE_VAL);
   lua_setfield(L, -2, "huge");
+  // 最大整数，常规系统上就是 int64 的最大值
+  // > print(math.maxinteger)
+  // 9223372036854775807
   lua_pushinteger(L, LUA_MAXINTEGER);
   lua_setfield(L, -2, "maxinteger");
+  // 最小整数，常规系统上就是 int64 的最小值
+  // > print(math.mininteger)
+  // -9223372036854775808
   lua_pushinteger(L, LUA_MININTEGER);
   lua_setfield(L, -2, "mininteger");
+  // 栈上面就剩 tbl，所以这里返回 1
   return 1;
 }
 
