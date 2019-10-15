@@ -52,6 +52,7 @@
 // 返回 x 的绝对值。(integer/float)
 //---------------------------------------------------------------------
 static int math_abs (lua_State *L) {
+  // lua_isinteger 判断是否是整数，和浮点数区分开来。
   if (lua_isinteger(L, 1)) {
     lua_Integer n = lua_tointeger(L, 1);
     if (n < 0) n = (lua_Integer)(0u - (lua_Unsigned)n);
@@ -111,9 +112,9 @@ static int math_atan (lua_State *L) {
 // > math.tointeger(2.3)
 // nil
 //---------------------------------------------------------------------
-
 static int math_toint (lua_State *L) {
   int valid;
+  // TODO: lua_tointegerx 功能留待后面解释
   lua_Integer n = lua_tointegerx(L, 1, &valid);
   if (valid)
     lua_pushinteger(L, n);
@@ -127,6 +128,7 @@ static int math_toint (lua_State *L) {
 
 static void pushnumint (lua_State *L, lua_Number d) {
   lua_Integer n;
+  // TODO: lua_numbertointeger 功能留待后面解释
   if (lua_numbertointeger(d, &n))  /* does 'd' fit in an integer? */
     lua_pushinteger(L, n);  /* result is integer */
   else
@@ -244,7 +246,11 @@ static int math_rad (lua_State *L) {
 }
 
 
+//---------------------------------------------------------------------
+// 返回参数中最小的值，大小由 Lua 操作 < 决定。(integer/float)
+//---------------------------------------------------------------------
 static int math_min (lua_State *L) {
+  // lua_gettop 返回参数个数
   int n = lua_gettop(L);  /* number of arguments */
   int imin = 1;  /* index of current minimum value */
   int i;
@@ -308,6 +314,7 @@ static int math_random (lua_State *L) {
 
 static int math_randomseed (lua_State *L) {
   l_srand((unsigned int)(lua_Integer)luaL_checknumber(L, 1));
+  // 忽略掉第一个值
   (void)l_rand(); /* discard first value to avoid undesirable correlations */
   return 0;
 }
