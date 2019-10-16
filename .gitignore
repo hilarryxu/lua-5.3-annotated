@@ -1,6 +1,4 @@
 *.o
 tags
 
-/src/liblua.a
-/src/lua
-/src/luac
+builddir/
