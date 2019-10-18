@@ -28,6 +28,7 @@
 
 
 /* mark for precompiled code ('<esc>Lua') */
+// 字节码文件开头标识
 #define LUA_SIGNATURE	"\x1bLua"
 
 /* option for multiple returns in 'lua_pcall' and 'lua_call' */
@@ -39,11 +40,15 @@
 ** (-LUAI_MAXSTACK is the minimum valid index; we keep some free empty
 ** space after that to help overflow detection)
 */
+// 注册表伪索引
+// 预留 1000 用于栈溢出检测
 #define LUA_REGISTRYINDEX	(-LUAI_MAXSTACK - 1000)
+// 上值索引，比注册表索引更小
 #define lua_upvalueindex(i)	(LUA_REGISTRYINDEX - (i))
 
 
 /* thread status */
+// 协程状态码
 #define LUA_OK		0
 #define LUA_YIELD	1
 #define LUA_ERRRUN	2
@@ -53,18 +58,23 @@
 #define LUA_ERRERR	6
 
 
+// lua 虚拟机结构
 typedef struct lua_State lua_State;
 
+
+//=====================================================================
+// lua 类型枚举值
+//=====================================================================
 
 /*
 ** basic types
 */
-#define LUA_TNONE		(-1)
+#define LUA_TNONE		(-1)    // 无效值
 
-#define LUA_TNIL		0
-#define LUA_TBOOLEAN		1
-#define LUA_TLIGHTUSERDATA	2
-#define LUA_TNUMBER		3
+#define LUA_TNIL		0       // nil
+#define LUA_TBOOLEAN		1   // bool型
+#define LUA_TLIGHTUSERDATA	2   // 轻量级用户数据
+#define LUA_TNUMBER		3       // 
 #define LUA_TSTRING		4
 #define LUA_TTABLE		5
 #define LUA_TFUNCTION		6
