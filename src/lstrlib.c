@@ -36,6 +36,7 @@
 
 
 /* macro to 'unsign' a character */
+// 转成 uchar
 #define uchar(c)	((unsigned char)(c))
 
 
@@ -43,14 +44,16 @@
 ** Some sizes are better limited to fit in 'int', but must also fit in
 ** 'size_t'. (We assume that 'lua_Integer' cannot be smaller than 'int'.)
 */
+// ~0 按位取反并约束为 size_t 类型，得到最大值
 #define MAX_SIZET	((size_t)(~(size_t)0))
 
+// 取两者较小的那个
 #define MAXSIZE  \
 	(sizeof(size_t) < sizeof(int) ? MAX_SIZET : (size_t)(INT_MAX))
 
 
 
-
+// 获取字符串长度
 static int str_len (lua_State *L) {
   size_t l;
   luaL_checklstring(L, 1, &l);
@@ -60,13 +63,14 @@ static int str_len (lua_State *L) {
 
 
 /* translate a relative string position: negative means back from end */
+// 可以转换负索引为正的
 static lua_Integer posrelat (lua_Integer pos, size_t len) {
   if (pos >= 0) return pos;
   else if (0u - (size_t)pos > len) return 0;
   else return (lua_Integer)len + pos + 1;
 }
 
-
+// 取子字符串
 static int str_sub (lua_State *L) {
   size_t l;
   const char *s = luaL_checklstring(L, 1, &l);
@@ -126,6 +130,7 @@ static int str_rep (lua_State *L) {
   const char *sep = luaL_optlstring(L, 3, "", &lsep);
   if (n <= 0) lua_pushliteral(L, "");
   else if (l + lsep < l || l + lsep > MAXSIZE / n)  /* may overflow? */
+    // 检查溢出 MAXSIZE 情况
     return luaL_error(L, "resulting string too large");
   else {
     size_t totallen = (size_t)n * l + (size_t)(n - 1) * lsep;
@@ -157,6 +162,7 @@ static int str_byte (lua_State *L) {
   if (pose - posi >= INT_MAX)  /* arithmetic overflow? */
     return luaL_error(L, "string slice too long");
   n = (int)(pose -  posi) + 1;
+  // 检查栈空间是否足够
   luaL_checkstack(L, n, "string slice too long");
   for (i=0; i<n; i++)
     lua_pushinteger(L, uchar(s[posi+i-1]));
