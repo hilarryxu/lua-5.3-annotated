@@ -74,19 +74,19 @@ typedef struct lua_State lua_State;
 #define LUA_TNIL		0       // nil
 #define LUA_TBOOLEAN		1   // bool型
 #define LUA_TLIGHTUSERDATA	2   // 轻量级用户数据
-#define LUA_TNUMBER		3       // 
-#define LUA_TSTRING		4
-#define LUA_TTABLE		5
-#define LUA_TFUNCTION		6
-#define LUA_TUSERDATA		7
-#define LUA_TTHREAD		8
+#define LUA_TNUMBER		3       // 数字
+#define LUA_TSTRING		4       // 字符串
+#define LUA_TTABLE		5       // 表
+#define LUA_TFUNCTION		6   // 函数
+#define LUA_TUSERDATA		7   // 用户数据
+#define LUA_TTHREAD		8       // 表示一个独立的执行序列
 
-#define LUA_NUMTAGS		9
+#define LUA_NUMTAGS		9       // 类型个数
 
 
 
 /* minimum Lua stack available to a C function */
-#define LUA_MINSTACK	20
+#define LUA_MINSTACK	20  // 给 C 函数的最小栈长度
 
 
 /* predefined values in the registry */
@@ -96,13 +96,15 @@ typedef struct lua_State lua_State;
 
 
 /* type of numbers in Lua */
+// 浮点数 double
 typedef LUA_NUMBER lua_Number;
 
-
 /* type for integer functions */
+// 整数 long
 typedef LUA_INTEGER lua_Integer;
 
 /* unsigned integer type */
+// 无符号整数
 typedef LUA_UNSIGNED lua_Unsigned;
 
 /* type for continuation-function contexts */
@@ -112,6 +114,7 @@ typedef LUA_KCONTEXT lua_KContext;
 /*
 ** Type for C functions registered with Lua
 */
+// 注册到 lua 中的 C 函数原型
 typedef int (*lua_CFunction) (lua_State *L);
 
 /*
@@ -131,6 +134,7 @@ typedef int (*lua_Writer) (lua_State *L, const void *p, size_t sz, void *ud);
 /*
 ** Type for memory-allocation functions
 */
+// 内存分配函数原型
 typedef void * (*lua_Alloc) (void *ud, void *ptr, size_t osize, size_t nsize);
 
 
@@ -138,6 +142,7 @@ typedef void * (*lua_Alloc) (void *ud, void *ptr, size_t osize, size_t nsize);
 /*
 ** generic extra include file
 */
+// 用户自定义包含的头文件
 #if defined(LUA_USER_H)
 #include LUA_USER_H
 #endif
@@ -152,6 +157,7 @@ extern const char lua_ident[];
 /*
 ** state manipulation
 */
+// 虚拟机操作函数
 LUA_API lua_State *(lua_newstate) (lua_Alloc f, void *ud);
 LUA_API void       (lua_close) (lua_State *L);
 LUA_API lua_State *(lua_newthread) (lua_State *L);
@@ -165,6 +171,7 @@ LUA_API const lua_Number *(lua_version) (lua_State *L);
 /*
 ** basic stack manipulation
 */
+// 栈操作函数
 LUA_API int   (lua_absindex) (lua_State *L, int idx);
 LUA_API int   (lua_gettop) (lua_State *L);
 LUA_API void  (lua_settop) (lua_State *L, int idx);
@@ -179,7 +186,7 @@ LUA_API void  (lua_xmove) (lua_State *from, lua_State *to, int n);
 /*
 ** access functions (stack -> C)
 */
-
+// 访问栈
 LUA_API int             (lua_isnumber) (lua_State *L, int idx);
 LUA_API int             (lua_isstring) (lua_State *L, int idx);
 LUA_API int             (lua_iscfunction) (lua_State *L, int idx);
@@ -202,7 +209,7 @@ LUA_API const void     *(lua_topointer) (lua_State *L, int idx);
 /*
 ** Comparison and arithmetic functions
 */
-
+// 数学操作
 #define LUA_OPADD	0	/* ORDER TM, ORDER OP */
 #define LUA_OPSUB	1
 #define LUA_OPMUL	2
@@ -279,6 +286,7 @@ LUA_API void  (lua_setuservalue) (lua_State *L, int idx);
 /*
 ** 'load' and 'call' functions (load and run Lua code)
 */
+// 加载和运行 lua 代码
 LUA_API void  (lua_callk) (lua_State *L, int nargs, int nresults,
                            lua_KContext ctx, lua_KFunction k);
 #define lua_call(L,n,r)		lua_callk(L, (n), (r), 0, NULL)
@@ -296,6 +304,7 @@ LUA_API int (lua_dump) (lua_State *L, lua_Writer writer, void *data, int strip);
 /*
 ** coroutine functions
 */
+// 协程操作
 LUA_API int  (lua_yieldk)     (lua_State *L, int nresults, lua_KContext ctx,
                                lua_KFunction k);
 LUA_API int  (lua_resume)     (lua_State *L, lua_State *from, int narg);
@@ -308,7 +317,7 @@ LUA_API int (lua_isyieldable) (lua_State *L);
 /*
 ** garbage-collection function and options
 */
-
+// GC 函数
 #define LUA_GCSTOP		0
 #define LUA_GCRESTART		1
 #define LUA_GCCOLLECT		2
@@ -325,7 +334,7 @@ LUA_API int (lua_gc) (lua_State *L, int what, int data);
 /*
 ** miscellaneous functions
 */
-
+// 其他函数
 LUA_API int   (lua_error) (lua_State *L);
 
 LUA_API int   (lua_next) (lua_State *L, int idx);
@@ -345,7 +354,7 @@ LUA_API void      (lua_setallocf) (lua_State *L, lua_Alloc f, void *ud);
 ** some useful macros
 ** ===============================================================
 */
-
+// 辅助宏
 #define lua_getextraspace(L)	((void *)((char *)(L) - LUA_EXTRASPACE))
 
 #define lua_tonumber(L,i)	lua_tonumberx(L,(i),NULL)
@@ -390,6 +399,7 @@ LUA_API void      (lua_setallocf) (lua_State *L, lua_Alloc f, void *ud);
 ** compatibility macros for unsigned conversions
 ** ===============================================================
 */
+// 兼容无符号转型
 #if defined(LUA_COMPAT_APIINTCASTS)
 
 #define lua_pushunsigned(L,n)	lua_pushinteger(L, (lua_Integer)(n))
@@ -401,7 +411,7 @@ LUA_API void      (lua_setallocf) (lua_State *L, lua_Alloc f, void *ud);
 
 /*
 ** {======================================================================
-** Debug API
+** Debug API 调试接口
 ** =======================================================================
 */
 
