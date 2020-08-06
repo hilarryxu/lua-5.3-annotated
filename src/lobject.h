@@ -35,6 +35,14 @@
 ** bit 6: whether value is collectable
 */
 
+//---------------------------------------------------------------------
+// 值类型标记说明：
+// 0-3 位：父类型
+// 4-5位：子类型
+// 6位：是否可垃圾回收
+//---------------------------------------------------------------------
+
+
 
 /*
 ** LUA_TFUNCTION variants:
@@ -44,25 +52,43 @@
 */
 
 /* Variant tags for functions */
+
+//---------------------------------------------------------------------
+// 0 - Lua 闭包
+// 1 - 轻量的C函数
+// 2 - C 闭包
+//---------------------------------------------------------------------
 #define LUA_TLCL	(LUA_TFUNCTION | (0 << 4))  /* Lua closure */
 #define LUA_TLCF	(LUA_TFUNCTION | (1 << 4))  /* light C function */
 #define LUA_TCCL	(LUA_TFUNCTION | (2 << 4))  /* C closure */
 
 
 /* Variant tags for strings */
+
+//---------------------------------------------------------------------
+// 0 - 短字符串
+// 1 - 长字符串
+//---------------------------------------------------------------------
 #define LUA_TSHRSTR	(LUA_TSTRING | (0 << 4))  /* short strings */
 #define LUA_TLNGSTR	(LUA_TSTRING | (1 << 4))  /* long strings */
 
 
 /* Variant tags for numbers */
+
+//---------------------------------------------------------------------
+// 0 - 浮点数
+// 1 - 整数
+//---------------------------------------------------------------------
 #define LUA_TNUMFLT	(LUA_TNUMBER | (0 << 4))  /* float numbers */
 #define LUA_TNUMINT	(LUA_TNUMBER | (1 << 4))  /* integer numbers */
 
 
 /* Bit mark for collectable types */
+// 可垃圾回收位
 #define BIT_ISCOLLECTABLE	(1 << 6)
 
 /* mark a tag as collectable */
+// 标记为可回收
 #define ctb(t)			((t) | BIT_ISCOLLECTABLE)
 
 
@@ -82,6 +108,14 @@ typedef struct GCObject GCObject;
 /*
 ** Common type has only the common header
 */
+
+//---------------------------------------------------------------------
+// struct GCObject {
+//   GCObject  *next;       // 指向下一个GC对象，形成链表，GC会用到
+//   lu_bype    tt;         // 对象类型
+//   lu_byte    marked;     // 对象标记，GC会用到
+// };
+//---------------------------------------------------------------------
 struct GCObject {
   CommonHeader;
 };
@@ -110,6 +144,12 @@ typedef union Value {
 #define TValuefields	Value value_; int tt_
 
 
+//---------------------------------------------------------------------
+// TValue {
+//   Value value_;  // union 类型的值
+//   int tt_;       // 类型标记
+// };
+//---------------------------------------------------------------------
 typedef struct lua_TValue {
   TValuefields;
 } TValue;
@@ -117,26 +157,44 @@ typedef struct lua_TValue {
 
 
 /* macro defining a nil value */
+// 初始化一个 nil 值
 #define NILCONSTANT	{NULL}, LUA_TNIL
 
-
+// 获取值
 #define val_(o)		((o)->value_)
 
-
 /* raw type tag of a TValue */
+// 获取类型
 #define rttype(o)	((o)->tt_)
 
 /* tag with no variants (bits 0-3) */
 #define novariant(x)	((x) & 0x0F)
 
 /* type tag of a TValue (bits 0-3 for tags + variant bits 4-5) */
+// 父类型 + 子类型
 #define ttype(o)	(rttype(o) & 0x3F)
 
 /* type tag of a TValue with no variants (bits 0-3) */
+// 父类型
 #define ttnov(o)	(novariant(rttype(o)))
 
 
 /* Macros to test type */
+
+//---------------------------------------------------------------------
+// 测试类型的宏
+// 垃圾回收类型有：
+//   string
+//    短字符串
+//    长字符串
+//   userdata
+//   closure
+//     lua 闭包
+//     C 闭包（包含上值的 C 函数）
+//   表
+//   proto
+//   thread
+//---------------------------------------------------------------------
 #define checktag(o,t)		(rttype(o) == (t))
 #define checktype(o,t)		(ttnov(o) == (t))
 #define ttisnumber(o)		checktype((o), LUA_TNUMBER)
@@ -160,6 +218,7 @@ typedef struct lua_TValue {
 
 
 /* Macros to access values */
+// 检测类型并读取实际内部的值
 #define ivalue(o)	check_exp(ttisinteger(o), val_(o).i)
 #define fltvalue(o)	check_exp(ttisfloat(o), val_(o).n)
 #define nvalue(o)	check_exp(ttisnumber(o), \
@@ -181,6 +240,7 @@ typedef struct lua_TValue {
 #define l_isfalse(o)	(ttisnil(o) || (ttisboolean(o) && bvalue(o) == 0))
 
 
+// 是否为可回收对象
 #define iscollectable(o)	(rttype(o) & BIT_ISCOLLECTABLE)
 
 
