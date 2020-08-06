@@ -30,6 +30,7 @@
 
 
 
+// 全局唯一的 nil 值
 LUAI_DDEF const TValue luaO_nilobject_ = {NILCONSTANT};
 
 
@@ -376,6 +377,9 @@ void luaO_tostring (lua_State *L, StkId obj) {
     len = lua_integer2str(buff, sizeof(buff), ivalue(obj));
   else {
     len = lua_number2str(buff, sizeof(buff), fltvalue(obj));
+    // lua 5.3 中，但是 5.1 是 2
+    // > tostring(2.0)
+    // 2.0
 #if !defined(LUA_COMPAT_FLOATSTRING)
     if (buff[strspn(buff, "-0123456789")] == '\0') {  /* looks like an int? */
       buff[len++] = lua_getlocaledecpoint();

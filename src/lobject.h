@@ -360,9 +360,17 @@ typedef TValue *StkId;  /* index to stack elements */
 ** Header for string value; string bytes follow the end of this structure
 ** (aligned according to 'UTString'; see next).
 */
+
+//---------------------------------------------------------------------
+// 字符串 {
+//   UTString       // 头部
+//   char[]         // 实际存放字符串数据
+// }
+//---------------------------------------------------------------------
 typedef struct TString {
   CommonHeader;
   lu_byte extra;  /* reserved words for short strings; "has hash" for longs */
+  // 短字符串长度，最大长度为256
   lu_byte shrlen;  /* length for short strings */
   unsigned int hash;
   union {
@@ -375,6 +383,7 @@ typedef struct TString {
 /*
 ** Ensures that address after this type is always fully aligned.
 */
+// 内存对齐用，其他几节也有类似定义
 typedef union UTString {
   L_Umaxalign dummy;  /* ensures maximum alignment for strings */
   TString tsv;
@@ -385,6 +394,8 @@ typedef union UTString {
 ** Get the actual string (array of bytes) from a 'TString'.
 ** (Access to 'extra' ensures that value is really a 'TString'.)
 */
+
+// 获取字符串数据部分
 #define getstr(ts)  \
   check_exp(sizeof((ts)->extra), cast(char *, (ts)) + sizeof(UTString))
 
@@ -393,6 +404,7 @@ typedef union UTString {
 #define svalue(o)       getstr(tsvalue(o))
 
 /* get string length from 'TString *s' */
+// 获取字符串长度
 #define tsslen(s)	((s)->tt == LUA_TSHRSTR ? (s)->shrlen : (s)->u.lnglen)
 
 /* get string length from 'TValue *o' */
@@ -403,11 +415,21 @@ typedef union UTString {
 ** Header for userdata; memory area follows the end of this structure
 ** (aligned according to 'UUdata'; see next).
 */
+
+//---------------------------------------------------------------------
+// userdata {
+//   UUdata         // 头部
+//   u_char[]       // 实际数据部分
+// }
+//---------------------------------------------------------------------
 typedef struct Udata {
   CommonHeader;
   lu_byte ttuv_;  /* user value's tag */
+  // 元表
   struct Table *metatable;
+  // 分配的内存大小
   size_t len;  /* number of bytes */
+  // 额外的 ud，类型由 ttuv_ 指出
   union Value user_;  /* user value */
 } Udata;
 
@@ -532,6 +554,10 @@ typedef union Closure {
 ** Tables
 */
 
+
+//---------------------------------------------------------------------
+// TValue | TValue + next
+//---------------------------------------------------------------------
 typedef union TKey {
   struct {
     TValuefields;
