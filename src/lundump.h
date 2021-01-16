@@ -23,6 +23,10 @@
 #define LUAC_FORMAT	0	/* this is the official format */
 
 /* load one chunk; from lundump.c */
+
+//---------------------------------------------------------------------
+// 加载二进制 chunk
+//---------------------------------------------------------------------
 LUAI_FUNC LClosure* luaU_undump (lua_State* L, ZIO* Z, const char* name);
 
 /* dump one chunk; from ldump.c */
