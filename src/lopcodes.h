@@ -29,20 +29,45 @@
 ===========================================================================*/
 
 
+
+//---------------------------------------------------------------------
+// 4 种指令模式
+//
+// iABC
+//   op A B C
+// iABx
+//   op A Bx
+// iAsBx
+//   op A sBx
+// iAx
+//   op Ax
+//---------------------------------------------------------------------
 enum OpMode {iABC, iABx, iAsBx, iAx};  /* basic instruction format */
 
 
 /*
 ** size and position of opcode arguments.
 */
+
+//---------------------------------------------------------------------
+// 操作数所占比特位数
+//---------------------------------------------------------------------
 #define SIZE_C		9
 #define SIZE_B		9
 #define SIZE_Bx		(SIZE_C + SIZE_B)
 #define SIZE_A		8
 #define SIZE_Ax		(SIZE_C + SIZE_B + SIZE_A)
 
+
+//---------------------------------------------------------------------
+// 操作码占 6 位
+//---------------------------------------------------------------------
 #define SIZE_OP		6
 
+
+//---------------------------------------------------------------------
+// 对应起始位
+//---------------------------------------------------------------------
 #define POS_OP		0
 #define POS_A		(POS_OP + SIZE_OP)
 #define POS_C		(POS_A + SIZE_A)
@@ -85,6 +110,10 @@ enum OpMode {iABC, iABx, iAsBx, iAx};  /* basic instruction format */
 /*
 ** the following macros help to manipulate instructions
 */
+
+//=====================================================================
+// 一些操作宏函数
+//=====================================================================
 
 #define GET_OPCODE(i)	(cast(OpCode, ((i)>>POS_OP) & MASK1(SIZE_OP,0)))
 #define SET_OPCODE(i,o)	((i) = (((i)&MASK0(SIZE_OP,POS_OP)) | \
@@ -164,6 +193,10 @@ enum OpMode {iABC, iABx, iAsBx, iAx};  /* basic instruction format */
 ** grep "ORDER OP" if you change these enums
 */
 
+
+//---------------------------------------------------------------------
+// 所有操作码
+//---------------------------------------------------------------------
 typedef enum {
 /*----------------------------------------------------------------------
 name		args	description
@@ -234,6 +267,7 @@ OP_EXTRAARG/*	Ax	extra (larger) argument for previous opcode	*/
 } OpCode;
 
 
+// 操作码总个数（47 个）
 #define NUM_OPCODES	(cast(int, OP_EXTRAARG) + 1)
 
 
@@ -278,6 +312,7 @@ enum OpArgMask {
   OpArgK   /* argument is a constant or register/constant */
 };
 
+// 操作码模式表
 LUAI_DDEC const lu_byte luaP_opmodes[NUM_OPCODES];
 
 #define getOpMode(m)	(cast(enum OpMode, luaP_opmodes[m] & 3))
@@ -287,6 +322,7 @@ LUAI_DDEC const lu_byte luaP_opmodes[NUM_OPCODES];
 #define testTMode(m)	(luaP_opmodes[m] & (1 << 7))
 
 
+// 操作码名称表
 LUAI_DDEC const char *const luaP_opnames[NUM_OPCODES+1];  /* opcode names */
 
 
